@@ -34,8 +34,6 @@ services:
       - qdrant
     networks:
       - qdrant-network
-    stdin_open: true
-    tty: true
 
 configs:
   qdrant_config:

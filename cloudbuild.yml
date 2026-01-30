@@ -32,7 +32,7 @@ images:
   - 'gcr.io/$PROJECT_ID/qdrant-admin-mcp:$COMMIT_SHA'
 
 substitutions:
-    _REGION: us-central1
+    _REGION: eu-west1
     _QDRANT_URL: ""
     _QDRANT_API_KEY: ""
     _LOGFIRE_TOKEN: ""
