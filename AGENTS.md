@@ -1,6 +1,16 @@
 # Qdrant Admin MCP
 
-FastMCP server for Qdrant administration.
+FastMCP server for Qdrant administration with async-first architecture.
+
+## Features
+
+- ✅ **Async-First**: All Qdrant operations use AsyncQdrantClient for optimal performance
+- ✅ **Collection Management**: Create, list, and delete collections
+- ✅ **Snapshot Management**: Create, list, delete, and restore from snapshots
+- ✅ **Type Safety**: Full Pydantic validation with detailed type hints
+- ✅ **MCP Annotations**: Proper hints for destructive operations
+- ✅ **Confirmation Required**: All destructive operations require explicit confirmation
+- ✅ **Comprehensive Logging**: All operations logged via Logfire
 
 ## Structure
 
@@ -11,7 +21,12 @@ FastMCP server for Qdrant administration.
 │   ├── settings.py        # Pydantic settings for environment configuration
 │   └── tools/             # All MCP tools
 │       ├── __init__.py    # Tool registry (TOOLS list)
-│       └── greet.py       # Example tool
+│       └── collection/    # Collection management tools (async)
+│           ├── client.py            # Async Qdrant client helper
+│           ├── list_collections.py
+│           ├── create_collection.py
+│           ├── delete_collection.py
+│           └── snapshots.py         # Snapshot management
 ├── Dockerfile             # Docker image definition
 ├── compose.yml            # Docker Compose configuration
 ├── .dockerignore          # Docker build exclusions
@@ -80,9 +95,10 @@ docker run -it --rm \
 
 ## Adding New Tools
 
-1. Create a new file in `src/tools/` with your tool function
+1. Create a new file in `src/tools/` (or subdirectory) with your tool function
 2. Add the tool to the `TOOLS` list in `src/tools/__init__.py`
-3. The tool will be automatically registered with the MCP server
+3. Optionally add annotations in `main.py` TOOL_ANNOTATIONS dict
+4. The tool will be automatically registered with the MCP server
 
 Example:
 ```python
@@ -106,6 +122,15 @@ TOOLS = [
     greet,
     my_tool,  # Add your new tool here
 ]
+
+# main.py (optional - add annotations)
+TOOL_ANNOTATIONS = {
+    "my_tool": {
+        "title": "My Tool",
+        "readOnlyHint": True,
+        "openWorldHint": False,
+    }
+}
 ```
 
 ## Configuration
@@ -120,11 +145,106 @@ The server uses `pydantic-settings` to manage environment variables. See `src/se
 
 ## Tools
 
-### greet
-Greets a person by name.
+### Collection Management
 
-**Args:**
-- `name` (str): The name of the person to greet
+#### list_collections
+List all collections in the Qdrant instance.
 
 **Returns:**
-- A greeting message
+- List of collection names
+
+**Annotations:** Read-only, external system access
+
+---
+
+#### create_collection
+Create a new collection in Qdrant with specified vector configuration.
+
+**Args:**
+- `name` (str): Name of the collection to create
+- `vector_size` (int): Size/dimensionality of vectors (must be >= 1)
+- `distance` (Literal["Cosine", "Euclid", "Dot", "Manhattan"]): Distance metric. Default: "Cosine"
+
+**Returns:**
+- Success message with collection details
+
+**Annotations:** Non-destructive write, external system access
+
+---
+
+#### delete_collection
+Delete a collection from Qdrant (DESTRUCTIVE OPERATION - requires confirmation).
+
+This operation permanently deletes the collection and all its data.
+
+**Args:**
+- `name` (str): Name of the collection to delete
+- `confirm` (bool): Must be true to confirm deletion. Default: false
+
+**Returns:**
+- Success message if deleted, or error if not confirmed
+
+**Annotations:** Destructive operation, external system access
+
+---
+
+### Snapshot Management
+
+#### create_snapshot
+Create a snapshot of a collection for backup or restoration.
+
+**Args:**
+- `collection_name` (str): Name of the collection to snapshot
+
+**Returns:**
+- Success message with snapshot name
+
+**Annotations:** Non-destructive write, external system access
+
+---
+
+#### list_snapshots
+List all snapshots for a collection.
+
+**Args:**
+- `collection_name` (str): Name of the collection
+
+**Returns:**
+- List of snapshot names
+
+**Annotations:** Read-only, external system access
+
+---
+
+#### delete_snapshot
+Delete a snapshot from a collection (DESTRUCTIVE OPERATION - requires confirmation).
+
+This operation permanently deletes the snapshot file.
+
+**Args:**
+- `collection_name` (str): Name of the collection
+- `snapshot_name` (str): Name of the snapshot to delete
+- `confirm` (bool): Must be true to confirm deletion. Default: false
+
+**Returns:**
+- Success message if deleted, or error if not confirmed
+
+**Annotations:** Destructive operation, external system access
+
+---
+
+#### recover_from_snapshot
+Recover a collection from a snapshot (DESTRUCTIVE OPERATION - requires confirmation).
+
+This operation will restore the collection to the state captured in the snapshot.
+Any data added after the snapshot was created will be lost.
+
+**Args:**
+- `collection_name` (str): Name of the collection to recover
+- `snapshot_name` (str): Name of the snapshot to restore from
+- `confirm` (bool): Must be true to confirm recovery. Default: false
+
+**Returns:**
+- Success message if recovered, or error if not confirmed
+
+**Annotations:** Destructive operation, external system access

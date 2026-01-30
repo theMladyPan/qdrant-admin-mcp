@@ -12,14 +12,14 @@ class QdrantSettings(BaseSettings):
         case_sensitive=True,
     )
 
-    url: str | None = Field(
-        None,
+    url: str = Field(
+        "http://localhost:6333",
         description="URL of the Qdrant instance",
     )
 
     api_key: str | None = Field(
         None,
-        description="API key for Qdrant instance, if required",
+        description="API key for Qdrant instance, if required, not required for local deployments",
     )
 
 
@@ -37,6 +37,8 @@ class Settings(BaseSettings):
         "qdrant-admin-mcp",
         description="Project name",
     )
+
+    qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
 
     model_config = SettingsConfigDict(
         env_file=".env",

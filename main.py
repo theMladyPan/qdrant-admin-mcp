@@ -29,9 +29,55 @@ It provides tools to interact with Qdrant vector database.
     """.strip(),
 )
 
-# Register all tools automatically
+# Map of tool names to their annotations
+TOOL_ANNOTATIONS = {
+    "list_collections": {
+        "title": "List Collections",
+        "readOnlyHint": True,
+        "openWorldHint": True,
+    },
+    "create_collection": {
+        "title": "Create Collection",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "openWorldHint": True,
+    },
+    "delete_collection": {
+        "title": "Delete Collection",
+        "readOnlyHint": False,
+        "destructiveHint": True,
+        "openWorldHint": True,
+    },
+    "list_snapshots": {
+        "title": "List Snapshots",
+        "readOnlyHint": True,
+        "openWorldHint": True,
+    },
+    "create_snapshot": {
+        "title": "Create Snapshot",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "openWorldHint": True,
+    },
+    "delete_snapshot": {
+        "title": "Delete Snapshot",
+        "readOnlyHint": False,
+        "destructiveHint": True,
+        "openWorldHint": True,
+    },
+    "recover_from_snapshot": {
+        "title": "Recover from Snapshot",
+        "readOnlyHint": False,
+        "destructiveHint": True,
+        "openWorldHint": True,
+    },
+}
+
+# Register all tools automatically with annotations
 for tool in TOOLS:
-    mcp.tool()(tool)
+    tool_name = tool.__name__
+    annotations = TOOL_ANNOTATIONS.get(tool_name, {})
+    mcp.tool(annotations=annotations)(tool)
 
 
 if __name__ == "__main__":
