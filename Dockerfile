@@ -1,5 +1,5 @@
 # Stage 1: Build stage - create virtual environment
-FROM python:3.13-slim AS builder
+FROM python:3.13-slim-trixie AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
@@ -12,8 +12,8 @@ COPY uv.lock .
 # Create virtual environment and install dependencies
 RUN uv sync --frozen --no-dev
 
-# Stage 2: Runtime stage - slim image with only .venv and app
-FROM python:3.13-slim
+# Stage 2: Runtime stage - slim-3.13-slim-trixie image with only .venv and app
+FROM python:3.13-slim-trixie
 
 WORKDIR /app
 

@@ -31,7 +31,7 @@ steps:
       - '1'
       - '--session-affinity'
       - '--cpu'
-      - '0.5'
+      - '1'
       - '--memory'
       - '256Mi'
       - '--allow-unauthenticated'
