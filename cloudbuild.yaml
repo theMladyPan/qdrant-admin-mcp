@@ -1,56 +1,43 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - '--no-cache'
+  # Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
       - '-t'
-      - >-
-        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - .
-      - '-f'
-      - Dockerfile
-    id: Build
-  - name: gcr.io/cloud-builders/docker
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/qdrant-admin-mcp:$COMMIT_SHA'
+      - '.'
+
+  # Push
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/qdrant-admin-mcp:$COMMIT_SHA'
+
+  # Deploy
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
     args:
-      - push
-      - >-
-        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-    id: Push
-  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
-    args:
-      - run
-      - deploy
-      - $_SERVICE_NAME
-      - '--platform=managed'
-      - >-
-        --image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - >-
-        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
-      - '--region=$_DEPLOY_REGION'
+      - 'run'
+      - 'deploy'
+      - 'qdrant-admin-mcp'
+      - '--image'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/qdrant-admin-mcp:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'QDRANT_URL=$_QDRANT_URL,QDRANT_API_KEY=$_QDRANT_API_KEY,LOGFIRE_TOKEN=$_LOGFIRE_TOKEN'
-      - '--quiet'
-    id: Deploy
-    entrypoint: gcloud
-images:
-  - >-
-    $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-options:
-  substitutionOption: ALLOW_LOOSE
-  logging: CLOUD_LOGGING_ONLY
+      - 'QDRANT_URL=$_QDRANT_URL'
+      - '--set-env-vars'
+      - 'QDRANT_API_KEY=$_QDRANT_API_KEY'
+      - '--set-env-vars'
+      - 'LOGFIRE_TOKEN=$_LOGFIRE_TOKEN'
+
 substitutions:
-  _AR_HOSTNAME: europe-west1-docker.pkg.dev
-  _AR_REPOSITORY: cloud-run-source-deploy
-  _AR_PROJECT_ID: mcp-servers-485920
-  _PLATFORM: managed
-  _SERVICE_NAME: qdrant-admin-mcp
-  _TRIGGER_ID: 1a108605-5ac7-4a34-86a7-2362ee1b60a2
-  _DEPLOY_REGION: europe-west1
+  _REGION: "europe-west1"
   _QDRANT_URL: ""
   _QDRANT_API_KEY: ""
   _LOGFIRE_TOKEN: ""
-tags:
-  - gcp-cloud-build-deploy-cloud-run
-  - gcp-cloud-build-deploy-cloud-run-managed
-  - qdrant-admin-mcp
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'

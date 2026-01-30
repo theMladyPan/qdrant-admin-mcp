@@ -15,15 +15,22 @@ async def get_collection(name: str) -> dict:
         client = await get_qdrant_client()
         collection_info = await client.get_collection(collection_name=name)
         
+        vectors_config = collection_info.config.params.vectors
+        
         result = {
             "name": name,
             "status": collection_info.status.value,
             "vectors_count": collection_info.points_count,
             "indexed_vectors_count": collection_info.indexed_vectors_count,
-            "vector_size": collection_info.config.params.vectors.size,
-            "distance": collection_info.config.params.vectors.distance.value,
             "segments_count": collection_info.segments_count,
         }
         
+        if hasattr(vectors_config, "size"):
+            result["vector_size"] = vectors_config.size
+            result["distance"] = vectors_config.distance.value
+        else:
+            # Handle named vectors
+            result["vectors_config"] = str(vectors_config)
+
         span.set_attributes(result)
         return result
