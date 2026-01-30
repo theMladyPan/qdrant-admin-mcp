@@ -6,7 +6,8 @@ from src.tools.points.common import get_embedding_model
 
 async def upsert_points(
     collection_name: str,
-    points: List[Dict[str, Any]]
+    points: List[Dict[str, Any]],
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
 ) -> dict[str, Any]:
     """Upsert points with automatic text embedding generation
     
@@ -17,12 +18,13 @@ async def upsert_points(
             - text: Text to embed (optional if vector provided)
             - payload: Dict of metadata (optional)
             - vector: List[float] (optional, overrides text embedding)
+        embedding_model: Fastembed model name (default: BAAI/bge-small-en-v1.5)
             
     Returns:
         Operation status
     """
     with logfire.span("Upsert Qdrant points", collection_name=collection_name, count=len(points)) as span:
-        model = get_embedding_model()
+        model = get_embedding_model(embedding_model)
         
         points_to_upsert = []
         

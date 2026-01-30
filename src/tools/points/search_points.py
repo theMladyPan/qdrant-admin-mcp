@@ -7,7 +7,11 @@ from src.tools.points.common import get_embedding_model
 
 
 async def search_points(
-    collection_name: str, query_text: str, limit: int = 10, score_threshold: Optional[float] = None
+    collection_name: str,
+    query_text: str,
+    limit: int = 10,
+    score_threshold: Optional[float] = None,
+    embedding_model: str = "BAAI/bge-small-en-v1.5",
 ) -> List[dict[str, Any]]:
     """Search for points using text query (converts text to vector)
 
@@ -16,13 +20,14 @@ async def search_points(
         query_text: Text to search for
         limit: Max number of results (default 10)
         score_threshold: Minimum score threshold
+        embedding_model: Fastembed model name (default: BAAI/bge-small-en-v1.5)
 
     Returns:
         List of matching points with scores
     """
     with logfire.span("Search Qdrant points", collection_name=collection_name, query=query_text) as span:
         with logfire.span("Generate embedding for query text") as embed_span:
-            model = get_embedding_model()
+            model = get_embedding_model(embedding_model)
             # fastembed returns a generator
             embeddings = list(model.embed([query_text]))
             vector = embeddings[0]
