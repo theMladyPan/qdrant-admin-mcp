@@ -133,6 +133,37 @@ TOOL_ANNOTATIONS = {
 }
 ```
 
+## HTTP Endpoints
+
+The server provides HTTP endpoints in addition to MCP tools:
+
+### GET /status
+
+Health check endpoint that verifies Qdrant availability and measures latency.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "qdrant_available": true,
+  "latency_ms": 7.35,
+  "collections_count": 1,
+  "error": null
+}
+```
+
+**Fields:**
+- `status` - "healthy" or "unhealthy"
+- `qdrant_available` - Boolean indicating if Qdrant is reachable
+- `latency_ms` - Response time in milliseconds (null if unavailable)
+- `collections_count` - Number of collections (null if unavailable)
+- `error` - Error message if unhealthy (null if healthy)
+
+**Example:**
+```bash
+curl http://localhost:4600/status
+```
+
 ## Configuration
 
 The server uses `pydantic-settings` to manage environment variables. See `src/settings.py` for available options:
