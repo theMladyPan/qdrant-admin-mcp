@@ -10,4 +10,5 @@ dependencies = [
     "pydantic>=2.12.5",
     "pydantic-settings>=2.8.0",
     "python-dotenv>=1.0.1",
+    "qdrant-client>=1.13.2",
 ]
