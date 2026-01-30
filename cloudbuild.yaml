@@ -24,18 +24,22 @@ steps:
       - '$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/qdrant-admin-mcp:$COMMIT_SHA'
       - '--region'
       - '$_REGION'
+      - '--cpu-throttling'
+      - '--concurrency'
+      - '1000'
+      - '--max'
+      - '1'
+      - '--session-affinity'
+      - '--cpu'
+      - '0.5'
+      - '--memory'
+      - '256Mi'
       - '--allow-unauthenticated'
-      - '--set-env-vars'
-      - 'QDRANT_URL=$_QDRANT_URL'
-      - '--set-env-vars'
-      - 'QDRANT_API_KEY=$_QDRANT_API_KEY'
       - '--set-env-vars'
       - 'LOGFIRE_TOKEN=$_LOGFIRE_TOKEN'
 
 substitutions:
   _REGION: "europe-west1"
-  _QDRANT_URL: ""
-  _QDRANT_API_KEY: ""
   _LOGFIRE_TOKEN: ""
 
 options:
