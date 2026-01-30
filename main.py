@@ -72,6 +72,28 @@ TOOL_ANNOTATIONS = {
         "destructiveHint": True,
         "openWorldHint": True,
     },
+    "get_points": {
+        "title": "Get Points",
+        "readOnlyHint": True,
+        "openWorldHint": True,
+    },
+    "delete_points": {
+        "title": "Delete Points",
+        "readOnlyHint": False,
+        "destructiveHint": True,
+        "openWorldHint": True,
+    },
+    "search_points": {
+        "title": "Search Points",
+        "readOnlyHint": True,
+        "openWorldHint": True,
+    },
+    "upsert_points": {
+        "title": "Upsert Points",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "openWorldHint": True,
+    },
 }
 
 # Register all tools automatically with annotations
@@ -80,14 +102,16 @@ for tool in TOOLS:
     annotations = TOOL_ANNOTATIONS.get(tool_name, {})
     mcp.tool(annotations=annotations)(tool)
 
+
 # Add custom HTTP routes using FastMCP's custom_route decorator
 @mcp.custom_route("/status", methods=["GET"])
 async def status_endpoint(request):
     """Check Qdrant availability and latency"""
     from starlette.responses import JSONResponse
+
     status_data = await get_status()
     return JSONResponse(status_data)
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse", host="0.0.0.0", port=4600)
+    mcp.run(transport="stdio")
