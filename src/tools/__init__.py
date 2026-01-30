@@ -19,9 +19,12 @@ from src.tools.points import (
     search_points,
     upsert_points,
 )
+from src.tools.status import status
 
 # List of all tools to be registered with the MCP server
 TOOLS = [
+    # Status
+    status,
     # Collection management
     list_collections,
     get_collection,

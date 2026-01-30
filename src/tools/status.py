@@ -1,4 +1,4 @@
-"""Status endpoint for checking Qdrant availability and latency"""
+"""Status tool for checking Qdrant availability and latency"""
 
 import time
 from typing import Any
@@ -8,8 +8,10 @@ import logfire
 from src.tools.collection.client import get_qdrant_client
 
 
-async def get_status() -> dict[str, Any]:
+async def status() -> dict[str, Any]:
     """Check Qdrant availability and measure latency
+
+    Always use this tool at the beginning of the session to verify that the Qdrant instance is reachable and responsive.
 
     Returns:
         Dictionary with status information including:

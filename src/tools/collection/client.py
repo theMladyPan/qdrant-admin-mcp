@@ -3,8 +3,6 @@
 from fastmcp.server.dependencies import get_http_request
 from qdrant_client import AsyncQdrantClient
 
-from src.settings import settings
-
 # Cache of (client, api_key) keyed by URL
 # strict requirement: use URL as cache key
 _clients: dict[str, tuple[AsyncQdrantClient, str | None]] = {}
@@ -12,9 +10,9 @@ _clients: dict[str, tuple[AsyncQdrantClient, str | None]] = {}
 
 async def get_qdrant_client() -> AsyncQdrantClient:
     """Get or create async Qdrant client instance based on request headers"""
-    # Default values from settings
-    url = settings.qdrant.url
-    api_key = settings.qdrant.api_key
+    # Default values
+    url = "http://localhost:6333"
+    api_key = None
 
     try:
         # Try to extract from request context
