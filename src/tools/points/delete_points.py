@@ -1,4 +1,4 @@
-from typing import Any, List, Union
+from typing import Any
 
 import logfire
 from qdrant_client.http.models import PointIdsList
@@ -6,7 +6,7 @@ from qdrant_client.http.models import PointIdsList
 from src.tools.collection.client import get_qdrant_client
 
 
-async def delete_points(collection_name: str, ids: List[Union[int, str]]) -> dict[str, Any]:
+async def delete_points(collection_name: str, ids: list[int | str]) -> dict[str, Any]:
     """Delete specific points by their IDs
 
     Args:

@@ -1,11 +1,11 @@
-from typing import Any, List, Union
+from typing import Any
 
 import logfire
 
 from src.tools.collection.client import get_qdrant_client
 
 
-async def get_points(collection_name: str, ids: List[Union[int, str]]) -> List[dict[str, Any]]:
+async def get_points(collection_name: str, ids: list[int | str]) -> list[dict[str, Any]]:
     """Retrieve specific points by their IDs
 
     Args:

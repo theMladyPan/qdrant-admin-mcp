@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any
 
 import logfire
 
@@ -10,9 +10,9 @@ async def search_points(
     collection_name: str,
     query_text: str,
     limit: int = 10,
-    score_threshold: Optional[float] = None,
+    score_threshold: float | None = None,
     embedding_model: str = "BAAI/bge-small-en-v1.5",
-) -> List[dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Search for points using text query (converts text to vector)
 
     Args:

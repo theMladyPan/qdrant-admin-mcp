@@ -1,12 +1,13 @@
+from typing import Any
+
 import logfire
-from typing import List, Dict, Any
 from qdrant_client.http.models import PointStruct
 from src.tools.collection.client import get_qdrant_client
 from src.tools.points.common import get_embedding_model
 
 async def upsert_points(
     collection_name: str,
-    points: List[Dict[str, Any]],
+    points: list[dict[str, Any]],
     embedding_model: str = "BAAI/bge-small-en-v1.5"
 ) -> dict[str, Any]:
     """Upsert points with automatic text embedding generation
