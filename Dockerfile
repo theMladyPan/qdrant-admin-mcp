@@ -26,11 +26,15 @@ ENV PYTHONUNBUFFERED=1
 COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
+COPY pyproject.toml .
 COPY main.py .
 COPY src/ ./src
 
 # Use the virtual environment
 ENV PATH="/app/.venv/bin:$PATH"
+
+# expose 4600 port
+EXPOSE 4600
 
 CMD ["python", "main.py"]
 

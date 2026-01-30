@@ -17,7 +17,7 @@ logfire.configure(
     distributed_tracing=False,
     environment=settings.environment,
     service_name=settings.project,
-    version=__version__,
+    service_version=__version__,
 )
 
 mcp = FastMCP(
@@ -35,4 +35,4 @@ for tool in TOOLS:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="sse", host="0.0.0.0", port=4600)

@@ -22,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - 4600:4600
     container_name: qdrant-admin-mcp
     restart: unless-stopped
     env_file:
