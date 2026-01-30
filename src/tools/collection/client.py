@@ -1,13 +1,13 @@
 """Helper to get Qdrant client instance"""
 
-from typing import Tuple, Dict, Optional
-from qdrant_client import AsyncQdrantClient
 from fastmcp.server.dependencies import get_http_request
+from qdrant_client import AsyncQdrantClient
+
 from src.settings import settings
 
 # Cache of (client, api_key) keyed by URL
 # strict requirement: use URL as cache key
-_clients: Dict[str, Tuple[AsyncQdrantClient, Optional[str]]] = {}
+_clients: dict[str, tuple[AsyncQdrantClient, str | None]] = {}
 
 
 async def get_qdrant_client() -> AsyncQdrantClient:
@@ -23,7 +23,7 @@ async def get_qdrant_client() -> AsyncQdrantClient:
             # Check headers (standardize on lowercase)
             if "x-qdrant-url" in request.headers:
                 url = request.headers["x-qdrant-url"]
-            
+
             if "x-qdrant-api-key" in request.headers:
                 api_key = request.headers["x-qdrant-api-key"]
     except Exception:
@@ -33,7 +33,7 @@ async def get_qdrant_client() -> AsyncQdrantClient:
     # Logic: Use URL as cache key
     # If the API key for that URL changes, we must recreate the client
     global _clients
-    
+
     if url in _clients:
         client, cached_key = _clients[url]
         if cached_key != api_key:
@@ -44,5 +44,5 @@ async def get_qdrant_client() -> AsyncQdrantClient:
     else:
         client = AsyncQdrantClient(url=url, api_key=api_key)
         _clients[url] = (client, api_key)
-        
+
     return _clients[url][0]

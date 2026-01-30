@@ -11,7 +11,7 @@ async def delete_points(collection_name: str, ids: list[int | str]) -> dict[str,
 
     Args:
         collection_name: Name of the collection
-        ids: List of point IDs to delete
+        ids: list of point IDs to delete
 
     Returns:
         Operation status

@@ -13,7 +13,7 @@ async def get_points(collection_name: str, ids: list[int | str]) -> list[dict[st
         ids: List of point IDs (integers or UUID strings)
 
     Returns:
-        List of points with their payload and vector info
+        list of points with their payload and vector info
     """
     with logfire.span("Get Qdrant points", collection_name=collection_name, point_ids=ids) as span:
         client = await get_qdrant_client()

@@ -10,8 +10,8 @@ class QdrantSettings(BaseSettings):
         env_file=".env",
     )
 
-    url: str = Field(
-        ...,
+    url: str | None = Field(
+        None,
         description="URL of the Qdrant instance",
     )
 

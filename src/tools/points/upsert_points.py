@@ -21,8 +21,8 @@ async def upsert_points(
         points: List of dicts, each containing:
             - id: Point ID (int or str)
             - text: Text to embed (optional if vector provided)
-            - payload: Dict of metadata (optional)
-            - vector: List[float] (optional, overrides text embedding)
+            - payload: dict of metadata (optional)
+            - vector: list[float] (optional, overrides text embedding)
         embedding_model: Fastembed model name (default: BAAI/bge-small-en-v1.5)
 
     Returns:
