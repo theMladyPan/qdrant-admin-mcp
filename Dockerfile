@@ -1,5 +1,5 @@
 # Stage 1: Build stage - create virtual environment
-FROM python:3.14-alpine AS builder
+FROM python:3.13-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
@@ -13,7 +13,7 @@ COPY uv.lock .
 RUN uv sync --frozen --no-dev
 
 # Stage 2: Runtime stage - slim image with only .venv and app
-FROM python:3.14-alpine
+FROM python:3.13-slim
 
 WORKDIR /app
 
