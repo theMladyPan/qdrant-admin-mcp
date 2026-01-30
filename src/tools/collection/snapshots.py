@@ -19,18 +19,16 @@ async def create_snapshot(
     Returns:
         Success message with snapshot name
     """
-    client = await get_qdrant_client()
-    logfire.info("Creating snapshot for collection {collection}", collection=collection_name)
-    
-    result = await client.create_snapshot(collection_name=collection_name)
-    snapshot_name = result.name
-    
-    logfire.info(
-        "Snapshot created for collection {collection}: {snapshot}",
-        collection=collection_name,
-        snapshot=snapshot_name
-    )
-    return f"Snapshot '{snapshot_name}' created successfully for collection '{collection_name}'"
+    with logfire.span("Create collection snapshot") as span:
+        client = await get_qdrant_client()
+        
+        result = await client.create_snapshot(collection_name=collection_name)
+        snapshot_name = result.name
+        
+        span.set_attribute("collection_name", collection_name)
+        span.set_attribute("snapshot_name", snapshot_name)
+        
+        return f"Snapshot '{snapshot_name}' created successfully for collection '{collection_name}'"
 
 
 async def list_snapshots(
@@ -44,18 +42,17 @@ async def list_snapshots(
     Returns:
         List of snapshot names
     """
-    client = await get_qdrant_client()
-    logfire.info("Listing snapshots for collection {collection}", collection=collection_name)
-    
-    snapshots = await client.list_snapshots(collection_name=collection_name)
-    snapshot_names = [snap.name for snap in snapshots]
-    
-    logfire.info(
-        "Found {count} snapshots for collection {collection}",
-        count=len(snapshot_names),
-        collection=collection_name
-    )
-    return snapshot_names
+    with logfire.span("List collection snapshots") as span:
+        client = await get_qdrant_client()
+        
+        snapshots = await client.list_snapshots(collection_name=collection_name)
+        snapshot_names = [snap.name for snap in snapshots]
+        
+        span.set_attribute("collection_name", collection_name)
+        span.set_attribute("snapshot_count", len(snapshot_names))
+        span.set_attribute("snapshots", snapshot_names)
+        
+        return snapshot_names
 
 
 async def delete_snapshot(
@@ -79,30 +76,30 @@ async def delete_snapshot(
     Returns:
         Success message if deleted, or error if not confirmed
     """
-    if not confirm:
-        return (
-            f"Deletion of snapshot '{snapshot_name}' not confirmed. "
-            "Set confirm=true to proceed with this destructive operation."
+    with logfire.span("Delete collection snapshot", _level="warn") as span:
+        if not confirm:
+            span.set_attribute("confirmed", False)
+            span.set_attribute("collection_name", collection_name)
+            span.set_attribute("snapshot_name", snapshot_name)
+            logfire.warn("Snapshot deletion not confirmed", collection_name=collection_name, snapshot_name=snapshot_name)
+            return (
+                f"Deletion of snapshot '{snapshot_name}' not confirmed. "
+                "Set confirm=true to proceed with this destructive operation."
+            )
+        
+        client = await get_qdrant_client()
+        
+        await client.delete_snapshot(
+            collection_name=collection_name,
+            snapshot_name=snapshot_name
         )
-    
-    client = await get_qdrant_client()
-    logfire.warn(
-        "Deleting snapshot {snapshot} from collection {collection}",
-        snapshot=snapshot_name,
-        collection=collection_name
-    )
-    
-    await client.delete_snapshot(
-        collection_name=collection_name,
-        snapshot_name=snapshot_name
-    )
-    
-    logfire.info(
-        "Snapshot {snapshot} deleted from collection {collection}",
-        snapshot=snapshot_name,
-        collection=collection_name
-    )
-    return f"Snapshot '{snapshot_name}' deleted successfully from collection '{collection_name}'"
+        
+        span.set_attribute("confirmed", True)
+        span.set_attribute("collection_name", collection_name)
+        span.set_attribute("snapshot_name", snapshot_name)
+        span.set_attribute("operation", "deleted")
+        
+        return f"Snapshot '{snapshot_name}' deleted successfully from collection '{collection_name}'"
 
 
 async def recover_from_snapshot(
@@ -127,27 +124,27 @@ async def recover_from_snapshot(
     Returns:
         Success message if recovered, or error if not confirmed
     """
-    if not confirm:
-        return (
-            f"Recovery of collection '{collection_name}' from snapshot '{snapshot_name}' not confirmed. "
-            "Set confirm=true to proceed with this destructive operation."
+    with logfire.span("Recover collection from snapshot", _level="warn") as span:
+        if not confirm:
+            span.set_attribute("confirmed", False)
+            span.set_attribute("collection_name", collection_name)
+            span.set_attribute("snapshot_name", snapshot_name)
+            logfire.warn("Collection recovery not confirmed", collection_name=collection_name, snapshot_name=snapshot_name)
+            return (
+                f"Recovery of collection '{collection_name}' from snapshot '{snapshot_name}' not confirmed. "
+                "Set confirm=true to proceed with this destructive operation."
+            )
+        
+        client = await get_qdrant_client()
+        
+        await client.recover_snapshot(
+            collection_name=collection_name,
+            snapshot_name=snapshot_name
         )
-    
-    client = await get_qdrant_client()
-    logfire.warn(
-        "Recovering collection {collection} from snapshot {snapshot}",
-        collection=collection_name,
-        snapshot=snapshot_name
-    )
-    
-    await client.recover_snapshot(
-        collection_name=collection_name,
-        snapshot_name=snapshot_name
-    )
-    
-    logfire.info(
-        "Collection {collection} recovered from snapshot {snapshot}",
-        collection=collection_name,
-        snapshot=snapshot_name
-    )
-    return f"Collection '{collection_name}' successfully recovered from snapshot '{snapshot_name}'"
+        
+        span.set_attribute("confirmed", True)
+        span.set_attribute("collection_name", collection_name)
+        span.set_attribute("snapshot_name", snapshot_name)
+        span.set_attribute("operation", "recovered")
+        
+        return f"Collection '{collection_name}' successfully recovered from snapshot '{snapshot_name}'"

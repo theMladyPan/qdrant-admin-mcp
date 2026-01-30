@@ -24,16 +24,22 @@ async def delete_collection(
     Returns:
         Success message if deleted, or error if not confirmed
     """
-    if not confirm:
-        return (
-            f"Deletion of collection '{name}' not confirmed. "
-            "Set confirm=true to proceed with this destructive operation."
-        )
-    
-    client = await get_qdrant_client()
-    logfire.warn("Deleting collection {name}", name=name)
-    
-    await client.delete_collection(collection_name=name)
-    
-    logfire.info("Collection {name} deleted successfully", name=name)
-    return f"Collection '{name}' has been permanently deleted"
+    with logfire.span("Delete Qdrant collection", _level="warn") as span:
+        if not confirm:
+            span.set_attribute("confirmed", False)
+            span.set_attribute("collection_name", name)
+            logfire.warn("Collection deletion not confirmed", collection_name=name)
+            return (
+                f"Deletion of collection '{name}' not confirmed. "
+                "Set confirm=true to proceed with this destructive operation."
+            )
+        
+        client = await get_qdrant_client()
+        
+        await client.delete_collection(collection_name=name)
+        
+        span.set_attribute("confirmed", True)
+        span.set_attribute("collection_name", name)
+        span.set_attribute("operation", "deleted")
+        
+        return f"Collection '{name}' has been permanently deleted"
