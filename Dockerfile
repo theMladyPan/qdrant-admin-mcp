@@ -33,8 +33,8 @@ COPY src/ ./src
 # Use the virtual environment
 ENV PATH="/app/.venv/bin:$PATH"
 
-# expose 4600 port
-EXPOSE 4600
+# expose 8080 port
+EXPOSE 8080
 
 CMD ["python", "main.py"]
 
