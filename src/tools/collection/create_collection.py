@@ -17,7 +17,10 @@ async def create_collection(
         Field(description="Distance metric to use for similarity search"),
     ] = "Cosine",
 ) -> str:
-    """Create a new collection in Qdrant with specified vector configuration
+    """Create a new collection in Qdrant with specified vector configuration.
+
+    Before using this tool, suggest 3 possible vector sizes and appropriate embedding models for the user's use case,
+    then let user decide on the vector size.
 
     Args:
         name: Name of the collection to create

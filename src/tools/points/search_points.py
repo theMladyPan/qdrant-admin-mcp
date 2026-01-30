@@ -15,6 +15,10 @@ async def search_points(
 ) -> list[dict[str, Any]]:
     """Search for points using text query (converts text to vector)
 
+    before searching, query the collection for vector size, if the dimensionality is likely to differ from the
+    default embedding model, provide user a few examples which model might be more suitable for embedding and let
+    the user choose the embedding model to use.
+
     Args:
         collection_name: Name of the collection
         query_text: Text to search for

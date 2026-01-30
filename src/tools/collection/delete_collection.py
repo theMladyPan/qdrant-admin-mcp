@@ -16,7 +16,8 @@ async def delete_collection(
 ) -> str:
     """Delete a collection from Qdrant (DESTRUCTIVE OPERATION - requires confirmation)
 
-    **Important**: ALWAYS ask user for verbal confirmation with all details before calling this tool!
+    **Important**: ALWAYS ask user for verbal confirmation with all details before calling this tool, even if user
+    specifically requested deletion, double check, e.g. are you sure to delete <name>?
 
     This operation permanently deletes the collection and all its data.
     The confirm parameter must be explicitly set to true.
