@@ -1,5 +1,6 @@
-import logfire
 import tomllib
+
+import logfire
 from fastmcp import FastMCP
 
 from src.settings import settings
@@ -11,12 +12,12 @@ with open("pyproject.toml", "rb") as f:
 __version__ = data["project"]["version"]
 
 logfire.configure(
-    token=settings.LOGFIRE_TOKEN,
+    token=settings.logfire_token,
     send_to_logfire="if-token-present",
     distributed_tracing=False,
-    environment=settings.ENVIRONMENT,
-    service_name=settings.PROJECT,
-    scrubbing=False,
+    environment=settings.environment,
+    service_name=settings.project,
+    version=__version__,
 )
 
 mcp = FastMCP(

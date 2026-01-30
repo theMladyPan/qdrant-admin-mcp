@@ -11,4 +11,7 @@ wheels/
 
 # Environment variables
 .env
+
+# Qdrant data
+qdrant/
 .history

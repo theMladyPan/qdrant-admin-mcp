@@ -12,6 +12,9 @@ FastMCP server for Qdrant administration.
 │   └── tools/             # All MCP tools
 │       ├── __init__.py    # Tool registry (TOOLS list)
 │       └── greet.py       # Example tool
+├── Dockerfile             # Docker image definition
+├── compose.yml            # Docker Compose configuration
+├── .dockerignore          # Docker build exclusions
 ├── .env.example           # Example environment variables
 └── pyproject.toml         # Project dependencies
 ```
@@ -32,6 +35,47 @@ cp .env.example .env
 3. Run the server:
 ```bash
 uv run python main.py
+```
+
+## Docker Compose
+
+Run the entire stack (MCP server + Qdrant):
+
+```bash
+# Start all services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop all services
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+```
+
+The compose setup includes:
+- **qdrant**: Vector database on ports 6333 (HTTP) and 6334 (gRPC)
+- **qdrant-admin-mcp**: MCP server connected to Qdrant
+
+Qdrant data is persisted in `./qdrant` directory.
+
+## Docker
+
+Build and run with Docker:
+
+```bash
+# Build the image
+docker build -t qdrant-admin-mcp .
+
+# Or with a deploy key for private dependencies
+docker build --secret id=GITHUB_DEPLOY_KEY,src=$HOME/.ssh/id_rsa -t qdrant-admin-mcp .
+
+# Run the container
+docker run -it --rm \
+  --env-file .env \
+  qdrant-admin-mcp
 ```
 
 ## Adding New Tools
@@ -71,6 +115,8 @@ The server uses `pydantic-settings` to manage environment variables. See `src/se
 - `LOGFIRE_TOKEN` - Optional Logfire token for observability
 - `ENVIRONMENT` - Environment name (default: "dev")
 - `PROJECT` - Project name (default: "qdrant-admin-mcp")
+- `QDRANT_URL` - Qdrant server URL (default: "http://localhost:6333")
+- `QDRANT_API_KEY` - Optional Qdrant API key
 
 ## Tools
 
