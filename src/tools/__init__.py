@@ -5,6 +5,7 @@ Add new tools to the TOOLS list for automatic registration.
 
 from src.tools.collection import (
     list_collections,
+    get_collection,
     create_collection,
     delete_collection,
     create_snapshot,
@@ -17,6 +18,7 @@ from src.tools.collection import (
 TOOLS = [
     # Collection management
     list_collections,
+    get_collection,
     create_collection,
     delete_collection,
     # Snapshot management

@@ -1,19 +1,17 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class QdrantSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="QDRANT_",
         extra="ignore",
-        case_sensitive=True,
+        case_sensitive=False,
+        env_file=".env",
     )
 
     url: str = Field(
-        "http://localhost:6333",
+        ...,
         description="URL of the Qdrant instance",
     )
 
@@ -38,12 +36,15 @@ class Settings(BaseSettings):
         description="Project name",
     )
 
-    qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
+    qdrant: QdrantSettings = Field(
+        default_factory=QdrantSettings,
+        description="Qdrant configuration settings",
+    )
 
     model_config = SettingsConfigDict(
-        env_file=".env",
         extra="ignore",
         case_sensitive=False,
+        env_file=".env",
     )
 
 
